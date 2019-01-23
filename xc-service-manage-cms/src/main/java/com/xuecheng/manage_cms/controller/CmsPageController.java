@@ -1,7 +1,5 @@
 package com.xuecheng.manage_cms.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,12 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.xuecheng.api.cms.CmsPageControllerApi;
-import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
-import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
-import com.xuecheng.framework.model.response.QueryResult;
-import com.xuecheng.manage_cms.dao.CmsPageRepositry;
+import com.xuecheng.manage_cms.service.PageService;
 
 /**
  * @author 谢磊
@@ -27,22 +22,14 @@ import com.xuecheng.manage_cms.dao.CmsPageRepositry;
 public class CmsPageController implements CmsPageControllerApi {
 	
 	@Autowired
-	private CmsPageRepositry cmsPageRepositry;
+	private PageService pageService;
 
 	@Override
 	@GetMapping("/list/{page}/{size}")
 	public QueryResponseResult findList(@PathVariable(value = "page") int page, @PathVariable(value = "size") int size,
 			QueryPageRequest queryPageRequest) {
-		
-		List<CmsPage> list = new ArrayList<CmsPage>();
-		CmsPage c = new CmsPage();
-		c.setPageHtml("aaaaaa");
-		list.add(c );
-		QueryResult queryResult = new QueryResult<>();
-		queryResult.setList(list );
-		queryResult.setTotal(list.size());
-		QueryResponseResult result = new QueryResponseResult(CommonCode.SUCCESS, queryResult );
 
+		QueryResponseResult result = pageService.findList(page, size, queryPageRequest);
 		return result;
 	}
 

@@ -7,4 +7,11 @@ spring:
     mongodb:
       uri:  mongodb://192.168.25.121:27017
       database: xc_cms
-      
+
+
+#
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/pinyougou?useUnicode=true&characterEncoding=gbk
+#    username: root
+#    password: 
+#    driver-class-name: com.mysql.jdbc.Driver

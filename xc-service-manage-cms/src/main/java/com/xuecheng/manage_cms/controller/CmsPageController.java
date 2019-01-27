@@ -4,11 +4,15 @@ package com.xuecheng.manage_cms.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.xuecheng.api.cms.CmsPageControllerApi;
+import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
+import com.xuecheng.framework.domain.cms.response.CmsPageResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.manage_cms.service.PageService;
 
@@ -28,9 +32,15 @@ public class CmsPageController implements CmsPageControllerApi {
 	@GetMapping("/list/{page}/{size}")
 	public QueryResponseResult findList(@PathVariable(value = "page") int page, @PathVariable(value = "size") int size,
 			QueryPageRequest queryPageRequest) {
-
+		System.out.println("--------->"+queryPageRequest);
 		QueryResponseResult result = pageService.findList(page, size, queryPageRequest);
 		return result;
+	}
+
+	@Override
+	@PostMapping("/add")
+	public CmsPageResult add(@RequestBody CmsPage cmsPage) {
+		return pageService.add(cmsPage);
 	}
 
 }

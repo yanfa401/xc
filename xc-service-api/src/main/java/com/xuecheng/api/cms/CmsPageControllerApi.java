@@ -9,6 +9,7 @@ import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
+import com.xuecheng.framework.model.response.ResponseResult;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -40,6 +41,22 @@ public interface CmsPageControllerApi {
 
 	
 	@ApiOperation("添加页面")
-//	@ApiImplicitParam(name = "cmsPage", value = "CmsPage对象Json字符串", required = true, paramType = "path", dataType = "json") 
 	public CmsPageResult add(CmsPage cmsPage);
+	
+	
+	@ApiOperation("查询页面信息")
+	public CmsPageResult get(String id);
+	
+	
+	
+	@ApiOperation("修改页面信息")
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "id", value = "页面id主键", required = true, paramType = "path", dataType = "int") })
+	public CmsPageResult edit(String id,CmsPage cmsPage);
+	
+	
+	@ApiOperation("删除页面")
+	public ResponseResult del(String id);
+	
+	
 }

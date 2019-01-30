@@ -1,5 +1,7 @@
 package com.xuecheng.manage_cms.service;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -13,10 +15,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
+import com.xuecheng.framework.domain.cms.response.CmsCode;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
+import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_cms.dao.CmsPageRepositry;
 
 /**
@@ -75,6 +80,7 @@ public class PageService {
 
 	/**
 	 * 新增页面
+	 * 
 	 * @param cmsPage
 	 * @return
 	 */
@@ -82,17 +88,93 @@ public class PageService {
 		// 判断3个参数是否存在
 		if (StringUtils.isBlank(cmsPage.getPageName()) || StringUtils.isBlank(cmsPage.getPageWebPath())
 				|| StringUtils.isBlank(cmsPage.getSiteId())) {
-			return new CmsPageResult(CommonCode.FAIL, null);
+			return new CmsPageResult(CommonCode.INVALID_PARAM, null);
 		}
 		// 根据pageName，pageWebPath，siteId作为组合组件，查询是否存在，如果存在则不能新增
 		CmsPage cmspage1 = cmsPageRepositry.findByPageNameAndPageWebPathAndSiteId(cmsPage.getPageName(),
 				cmsPage.getPageWebPath(), cmsPage.getSiteId());
-		if(cmspage1==null) {
-			cmsPage.setPageId(null);
-			CmsPage result = cmsPageRepositry.save(cmsPage);
-			return new CmsPageResult(CommonCode.SUCCESS, result);
+		
+		if (cmspage1 != null) {
+			//如果页面已经存在
+			ExceptionCast.cast(CmsCode.CMS_ADDPAGE_EXISTSNAME);
+		}
+		
+		cmsPage.setPageId(null);
+		CmsPage result = cmsPageRepositry.save(cmsPage);
+		return new CmsPageResult(CommonCode.SUCCESS, result);
+		
+	}
+
+	/**
+	 * 根据id获取页面详情
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public CmsPageResult get(String id) {
+		CmsPage cmsPage = getCmsPageById(id);
+		if (cmsPage == null) {
+			return new CmsPageResult(CommonCode.FAIL, cmsPage);
+		}
+		return new CmsPageResult(CommonCode.SUCCESS, cmsPage);
+	}
+
+	private CmsPage getCmsPageById(String id) {
+		CmsPage cmsPage = null;
+		Optional<CmsPage> cmspageOptional = cmsPageRepositry.findById(id);
+		if (cmspageOptional.isPresent()) {
+			cmsPage = cmspageOptional.get();
+		}
+		return cmsPage;
+	}
+
+	/**
+	 * 修改cmspage信息
+	 * 
+	 * @param id
+	 *            主键id
+	 * @param cmsPage
+	 *            需要修改的内容
+	 * @return
+	 */
+	public CmsPageResult edit(String id, CmsPage cmsPage) {
+		// 获取当前需要修改的数据对象
+		CmsPage currentCmsPage = getCmsPageById(id);
+		if (currentCmsPage != null) {
+			// 更新模板id
+			currentCmsPage.setTemplateId(cmsPage.getTemplateId());
+			// 更新所属站点
+			currentCmsPage.setSiteId(cmsPage.getSiteId());
+			// 更新页面别名
+			currentCmsPage.setPageAliase(cmsPage.getPageAliase());
+			// 更新页面名称
+			currentCmsPage.setPageName(cmsPage.getPageName());
+			// 更新访问路径
+			currentCmsPage.setPageWebPath(cmsPage.getPageWebPath());
+			// 更新物理路径
+			currentCmsPage.setPagePhysicalPath(cmsPage.getPagePhysicalPath());
+			// 执行更新操作
+			CmsPage result = cmsPageRepositry.save(currentCmsPage);
+			if (result != null) {
+				return new CmsPageResult(CommonCode.SUCCESS, result);
+			}
+
 		}
 		return new CmsPageResult(CommonCode.FAIL, null);
 	}
-
+	
+	/**
+	 * 根据id删除
+	 * @param id
+	 * @return
+	 */
+	public ResponseResult del(String id) {
+		Optional<CmsPage> optional = cmsPageRepositry.findById(id);
+		if(optional.isPresent()) {
+			//如果存在，则删除
+			cmsPageRepositry.deleteById(id);
+			return new ResponseResult(CommonCode.SUCCESS);
+		}
+		return new ResponseResult(CommonCode.FAIL);
+	}
 }
